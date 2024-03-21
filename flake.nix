@@ -16,6 +16,11 @@
           nodePackages.yarn
           nodejs
         ];
+        shellHook = ''
+          if ! [[ ":$PATH:" = *:"$PWD/node_modules/.bin":* ]]; then
+            export PATH="$PWD/node_modules/.bin:$PATH"
+          fi
+        '';
       };
     }
   );
