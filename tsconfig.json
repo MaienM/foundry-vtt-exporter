@@ -1,11 +1,11 @@
 {
-	"include": ["src/**/*"],
+	"include": ["src/**/*", "test/**/*"],
 	"compilerOptions": {
 		"strict": true,
-		"outDir": "bin",
+		"outDir": "dist",
 		"target": "esnext",
-		"module": "esnext",
-		"moduleResolution": "node",
+		"module": "nodenext",
+		"moduleResolution": "nodenext",
 		"sourceMap": true,
 		"experimentalDecorators": true,
 		"pretty": true,

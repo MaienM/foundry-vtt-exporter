@@ -2,12 +2,18 @@
   "name": "foundry-vtt-exporter",
   "version": "0.1.0",
   "description": "Exporter for FoundryVTT data to plain files.",
-  "main": "index.js",
   "repository": "https://github.com/MaienM/foundry-vtt-exporter",
   "author": "Michon van Dooren <me@maienm.com>",
   "license": "MIT",
+  "type": "module",
+  "exports": "./src/main.js",
+  "scripts": {
+    "start": "node --import=./ts-loader.js ./src/main.ts"
+  },
   "devDependencies": {
     "@maienm/eslint-config": "^1.9.0",
+    "@types/node": "^20.11.30",
+    "@typescript-eslint/eslint-plugin": "^7.3.1",
     "eslint": "8.57.0",
     "eslint-import-resolver-typescript": "3.6.1",
     "eslint-plugin-chai-expect": "3.0.0",
@@ -22,6 +28,11 @@
     "eslint-plugin-promise": "6.1.1",
     "eslint-plugin-react": "7.34.0",
     "eslint-plugin-unicorn": "51.0.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.4.3"
+  },
+  "dependencies": {
+    "classic-level": "^1.4.1",
+    "typescript-memoize": "^1.1.1"
   }
 }
