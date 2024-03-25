@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs';
-import * as fs from 'node:fs/promises';
+import { cp, readFile, rm, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { basename, join } from 'node:path';
 import { ClassicLevel } from 'classic-level';
@@ -25,12 +25,12 @@ class DatabasePath {
 	 */
 	@Memoize()
 	async version(): Promise<string> {
-		const manifestName = await fs.readFile(join(this.#sourceDir, 'CURRENT'), 'utf-8');
+		const manifestName = await readFile(join(this.#sourceDir, 'CURRENT'), 'utf-8');
 		const manifestVersion = manifestName.replace('MANIFEST-', '').trim();
 
 		const logVersion = parseInt(manifestVersion, 10) + 1;
 		const logName = `${logVersion.toString(10).padStart(6, '0')}.log`;
-		const logStat = await fs.stat(join(this.#sourceDir, logName));
+		const logStat = await stat(join(this.#sourceDir, logName));
 		const logSize = logStat.size;
 
 		return `${manifestVersion}+${logSize}`;
@@ -49,32 +49,27 @@ class DatabasePath {
 	 */
 	async open<T, D extends BaseDatabase<T>>(dbClass: DatabaseClass<D>): Promise<D> {
 		const version = await this.version();
-		const targetDir = join(tmpdir(), 'foundry-vtt-database-copy', `${this.name}-${version}`);
+		const targetDir = join(tmpdir(), `foundry-vtt-database-copy-${this.name}-${version}`);
 		if (!existsSync(join(targetDir, 'CURRENT'))) {
-			await fs.rm(targetDir, {
+			await rm(targetDir, {
 				recursive: true,
 				force: true,
 			});
-			await fs.mkdir(targetDir, {
+			await cp(this.#sourceDir, targetDir, {
 				recursive: true,
 			});
-			await Promise.all((await fs.readdir(this.#sourceDir)).map(async (file) => {
-				if (file === 'LOCK') {
-					return;
-				}
-				await fs.copyFile(join(this.#sourceDir, file), join(targetDir, file));
-			}));
+			await rm(join(targetDir, 'LOCK'));
 		}
 
 		try {
 			await ClassicLevel.repair(targetDir);
 			const levelDB = new ClassicLevel(targetDir);
-			await levelDB.open();
 			await levelDB.compactRange('0', Number.MAX_SAFE_INTEGER.toString());
 
 			return await dbClass.create(levelDB) as D;
 		} catch (e) {
-			await fs.rm(join(targetDir, 'CURRENT'), {
+			await rm(join(targetDir), {
+				recursive: true,
 				force: true,
 			});
 			throw e;

@@ -2,6 +2,7 @@
 	"include": ["src/**/*", "test/**/*"],
 	"compilerOptions": {
 		"strict": true,
+		"baseUrl": "./",
 		"outDir": "dist",
 		"target": "esnext",
 		"module": "nodenext",
@@ -12,6 +13,12 @@
 		"noFallthroughCasesInSwitch": true,
 		"noImplicitReturns": true,
 		"forceConsistentCasingInFileNames": true,
+		"paths": {
+			"~tests/*": ["./src/__tests__/*"],
+			"~src/*": ["./src/*"],
+		},
+		// We don't actually need this, but setting it shuts up the warning ts-jest show stating it might fix issues (which we are not having). 
+		"esModuleInterop": true,
 	},
 	"ts-node": {
 		"esm": true,

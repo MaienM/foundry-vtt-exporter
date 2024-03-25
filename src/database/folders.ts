@@ -1,7 +1,7 @@
 import { join } from 'node:path';
 import BaseDatabase from './base.js';
 
-interface Folder {
+export interface Folder {
 	/** The ID. */
 	_id: string;
 
