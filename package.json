@@ -43,5 +43,9 @@
     "classic-level": "^1.4.1",
     "glob": "^10.3.10",
     "typescript-memoize": "^1.1.1"
+  },
+  "resolutions": {
+    "wrap-ansi": "7.0.0",
+    "string-width": "4.2.3"
   }
 }
