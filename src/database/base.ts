@@ -36,7 +36,7 @@ class BaseDatabase<T> {
 	/**
 	 * Iterate over the entries in the database.
 	 */
-	async* values(): AsyncGenerator<T> {
+	async *values(): AsyncGenerator<T> {
 		for await (const rawEntry of this.#db.values()) {
 			yield JSON.parse(rawEntry) as T;
 		}
