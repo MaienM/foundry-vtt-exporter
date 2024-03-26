@@ -10,6 +10,9 @@ export interface Folder {
 
 	/** The name of the folder. */
 	name: string;
+
+	/** The type of the folder. */
+	type: string;
 }
 
 /**
@@ -21,7 +24,9 @@ class FoldersDatabase extends BaseDatabase<Folder> {
 
 	protected async init() {
 		for await (const entry of this.values()) {
-			this.#folders[entry._id] = entry;
+			if (entry.type === 'Macro') {
+				this.#folders[entry._id] = entry;
+			}
 		}
 	}
 
@@ -40,6 +45,13 @@ class FoldersDatabase extends BaseDatabase<Folder> {
 			throw new Error(`Unknown folder ${id}, known ${JSON.stringify(Object.keys(this.#folders))}.`);
 		}
 		return join(this.getPath(folder.folder), `${folder.name} [${id}]`);
+	}
+
+	/**
+	 * Get paths as returned for {@see getPath} for all known folders.
+	 */
+	getFolderPaths(): string[] {
+		return Object.keys(this.#folders).map(this.getPath.bind(this));
 	}
 }
 export default FoldersDatabase;

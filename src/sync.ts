@@ -1,5 +1,5 @@
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
+import { join, relative } from 'node:path';
 import { isDeepStrictEqual } from 'node:util';
 import { glob } from 'glob';
 import DatabaseIndex from './database/index.js';
@@ -18,8 +18,6 @@ export enum SyncResult {
 
 /**
  * Update the dump so that it's contents match the macros in the databases stored in the given path.
- *
- * Will clean up old macro files, but not directories (as git will ignore empty directories anyway).
  */
 export default async (databasePath: string, dumpPath: string): Promise<SyncResult> => {
 	// Create database index.
@@ -42,48 +40,61 @@ export default async (databasePath: string, dumpPath: string): Promise<SyncResul
 		// If we can't read the metadata we just assume a sync is needed.
 	}
 
+	const updatedPaths: Set<string> = new Set();
+
 	// Open databases.
 	const folders = await index.open('folders');
 	const macros = await index.open('macros');
 
+	// Ensure the folders exist.
+	await Promise.all(
+		folders.getFolderPaths().map(async (name) => {
+			const path = join(dumpPath, name);
+			await mkdir(path, { recursive: true });
+			updatedPaths.add(path);
+		}),
+	);
+
 	// Update all files.
-	await mkdir(dumpPath, {
-		recursive: true,
-	});
 	const filePromises = [];
 	for await (const macro of macros.values()) {
 		filePromises.push((async () => {
 			const ext = macro.type === 'script' ? '.js' : '.macro';
-			const targetFile = join(dumpPath, folders.getPath(macro.folder), `${macro.name} [${macro._id}]${ext}`);
-			await mkdir(dirname(targetFile), { recursive: true });
-			await writeFile(targetFile, macro.command);
-			return targetFile;
+			const filename = `${macro.name} [${macro._id}]${ext}`;
+			const path = join(dumpPath, folders.getPath(macro.folder), filename);
+			await writeFile(path, macro.command);
+			updatedPaths.add(path);
 		})());
 	}
-	const updatedFiles = new Set(await Promise.all(filePromises));
+	await Promise.all(filePromises);
 
 	// Write metadata.
 	await writeFile(metafile, JSON.stringify(metadata, null, '\t'));
-	updatedFiles.add(metafile);
+	updatedPaths.add(metafile);
 
-	// Remove any old files that are no longer needed.
-	const files = await glob('**/*', {
+	// Remove any old items that are no longer needed.
+	const items = await glob('**/*', {
 		cwd: dumpPath,
 		dot: true,
-		nodir: true,
 		ignore: [
 			'./',
 			'./.git/',
 		],
 		absolute: true,
 	});
-	const deletePromises = [];
-	for (const file of files) {
-		if (!updatedFiles.has(file)) {
-			deletePromises.push(rm(file));
+	const deletePromises: Record<string, Promise<unknown>> = {};
+	for (const item of items) {
+		if (updatedPaths.has(item)) {
+			continue;
 		}
+		if (Object.keys(deletePromises).some((p) => !relative(p, item).startsWith('..'))) {
+			continue;
+		}
+		deletePromises[item] = rm(item, {
+			recursive: true,
+		});
 	}
-	await Promise.all(deletePromises);
+	await Promise.all(Object.values(deletePromises));
 
 	return SyncResult.Updated;
 };

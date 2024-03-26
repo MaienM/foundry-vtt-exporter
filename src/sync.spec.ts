@@ -1,6 +1,6 @@
 import { cp, rmdir } from 'node:fs/promises';
 import { join } from 'node:path';
-import { DUMP_PATHS } from '~tests/dumps.js';
+import { DUMP_NAMES, DUMP_PATHS } from '~tests/dumps.js';
 import sync, { SyncResult } from './sync.js';
 
 describe('sync', () => {
@@ -30,4 +30,21 @@ describe('sync', () => {
 			await expect(target).toMatchDirectory(existingDump);
 		},
 	);
+
+	const pairs = DUMP_NAMES.slice(1).map((to, idx) => [to, DUMP_NAMES[idx]] as const);
+	it.each(pairs)('should dump %s correctly when starting with %s', async (to, from) => {
+		const fromPath = DUMP_PATHS[from];
+		const toPath = DUMP_PATHS[to];
+
+		const existingDump = join(fromPath, 'result');
+		const target = await createTempDir();
+		await rmdir(target);
+		await cp(existingDump, target, {
+			recursive: true,
+		});
+		const result = await sync(toPath, target);
+
+		expect(result).toBe(SyncResult.Updated);
+		await expect(target).toMatchDirectory(join(toPath, 'result'));
+	});
 });

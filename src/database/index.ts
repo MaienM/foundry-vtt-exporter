@@ -1,4 +1,4 @@
-import { join } from 'path';
+import { join } from 'node:path';
 import { Memoize } from 'typescript-memoize';
 import { DatabaseClass } from './base.js';
 import FoldersDatabase from './folders.js';

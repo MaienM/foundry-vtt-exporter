@@ -60,7 +60,7 @@ const toMatchDirectory = async (path: string, snapshot: string): Promise<jest.Cu
 			cwd,
 			dot: true,
 			withFileTypes: true,
-			ignore: ['./'],
+			ignore: ['./', '*/.keepdir'],
 		});
 		return Object.fromEntries(
 			await Promise.all(files.map(async (f) => (

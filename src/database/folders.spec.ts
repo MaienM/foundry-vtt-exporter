@@ -2,29 +2,44 @@ import { createMockClassicLevel } from '~tests/classic-level.js';
 import FoldersDatabase, { Folder } from './folders.js';
 
 describe('FoldersDatabase', () => {
-	describe('.getPath', () => {
-		const setupDatabase = () => {
-			const levelDB = createMockClassicLevel<Folder>([
-				{
-					_id: '01',
-					folder: undefined,
-					name: 'Foo',
-				},
-				{
-					_id: '02',
-					folder: '01',
-					name: 'Bar',
-				},
-				{
-					_id: '03',
-					folder: '02',
-					name: 'Baz',
-				},
-			]);
-			// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-			return FoldersDatabase.create(levelDB) as Promise<FoldersDatabase>;
-		};
+	const setupDatabase = () => {
+		const levelDB = createMockClassicLevel<Folder>([
+			{
+				_id: '01',
+				folder: undefined,
+				name: 'Foo',
+				type: 'Macro',
+			},
+			{
+				_id: '02',
+				folder: '01',
+				name: 'Bar',
+				type: 'Macro',
+			},
+			{
+				_id: '03',
+				folder: '02',
+				name: 'Baz',
+				type: 'Macro',
+			},
+			{
+				_id: '04',
+				folder: undefined,
+				name: 'Things',
+				type: 'Compendium',
+			},
+			{
+				_id: '05',
+				folder: '04',
+				name: 'Stuff',
+				type: 'Compendium',
+			},
+		]);
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+		return FoldersDatabase.create(levelDB) as Promise<FoldersDatabase>;
+	};
 
+	describe('.getPath', () => {
 		it('should return the correct result for undefined', async () => {
 			const db = await setupDatabase();
 			expect(db.getPath(undefined)).toBe('');
@@ -42,7 +57,25 @@ describe('FoldersDatabase', () => {
 
 		it('should throw for an unknown folder', async () => {
 			const db = await setupDatabase();
-			expect(() => db.getPath('04')).toThrow(/^Unknown folder 04/);
+			expect(() => db.getPath('99')).toThrow(/^Unknown folder/);
+		});
+
+		it('should treat a non-macro folder as unknown', async () => {
+			const db = await setupDatabase();
+			expect(() => db.getPath('04')).toThrow(/^Unknown folder/);
+		});
+	});
+
+	describe('.getFolderPaths', () => {
+		it('should return the correct result', async () => {
+			const db = await setupDatabase();
+			expect(new Set(db.getFolderPaths())).toEqual(
+				new Set([
+					'Foo [01]',
+					'Foo [01]/Bar [02]',
+					'Foo [01]/Bar [02]/Baz [03]',
+				]),
+			);
 		});
 	});
 });

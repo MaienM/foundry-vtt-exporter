@@ -73,6 +73,10 @@ describe('DatabasePath', () => {
 				folders: '000011+1032',
 				macros: '000011+0',
 			},
+			'10_empty_folder': {
+				folders: '000016+335',
+				macros: '000015+0',
+			},
 		};
 		it.each(flattenRecord(dumpsVersions))('should return correct version for %s/%s', async (dump, db, version) => {
 			const path = new DatabasePath(join(DUMP_PATHS[dump], db));

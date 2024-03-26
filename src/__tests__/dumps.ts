@@ -12,6 +12,7 @@ export const DUMP_NAMES = [
 	'07_deletions_type_change',
 	'08_saved',
 	'09_folder_renames',
+	'10_empty_folder',
 ] as const;
 
 export type Dump = typeof DUMP_NAMES[number];

@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs';
+import { readFileSync } from 'node:fs';
 import * as JSONC from 'jsonc-parser';
 import { pathsToModuleNameMapper } from 'ts-jest';
 // eslint-disable-next-line import/extensions
