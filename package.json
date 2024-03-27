@@ -10,7 +10,8 @@
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watchAll",
-    "start": "node --import=./ts-loader.js ./src/main.ts"
+    "start": "node --import=./ts-loader.js ./src/main.ts",
+    "build": "tsc"
   },
   "devDependencies": {
     "@maienm/eslint-config": "^1.9.0",

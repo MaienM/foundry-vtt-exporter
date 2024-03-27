@@ -20,6 +20,14 @@
           if ! [[ ":$PATH:" = *:"$PWD/node_modules/.bin":* ]]; then
             export PATH="$PWD/node_modules/.bin:$PATH"
           fi
+
+          source .env
+          (
+            real_version="$(node --version | cut -c2-)"
+            if [ "$NODE_VERSION" != "$real_version" ]; then
+              >&2 echo "WARNING: Rust version $NODE_VERSION is specified in .env, but the installed version is $real_version."
+            fi
+          )
         '';
       };
     }
