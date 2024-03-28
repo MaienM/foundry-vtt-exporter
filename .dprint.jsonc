@@ -21,6 +21,6 @@
 		'src/__tests__/dumps/',
 	],
 	plugins: [
-		'https://plugins.dprint.dev/typescript-0.85.0.wasm',
+		'https://plugins.dprint.dev/typescript-0.89.3.wasm',
 	],
 }
