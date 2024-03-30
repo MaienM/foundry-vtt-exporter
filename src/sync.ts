@@ -4,24 +4,47 @@ import { isDeepStrictEqual } from 'node:util';
 import { glob } from 'glob';
 import DatabaseIndex from './database/index.js';
 
+/**
+ * The metadata for a dump.
+ */
 interface Metadata {
+	/**
+	 * The versions of the databases that this dump is for.
+	 *
+	 * This is used to determine whether the dump even needs updating.
+	 */
 	versions: {
 		folders: string;
 		macros: string;
 	};
 }
 
+/**
+ * The arguments for a sync.
+ */
+export interface SyncOptions {
+	/** Path to the directory containing the Foundry VTT databases. */
+	databasePath: string;
+	/** Path to the directory to store the dump in. */
+	dumpPath: string;
+}
+
+/**
+ * The result of a sync.
+ */
 export enum SyncResult {
-	NoChange,
+	/** The dump has been updated. */
 	Updated,
+	/** No changes (the dump was already up-to-date). */
+	NoChange,
 }
 
 /**
  * Update the dump so that it's contents match the macros in the databases stored in the given path.
  */
-export default async (databasePath: string, dumpPath: string): Promise<SyncResult> => {
+export default async (options: SyncOptions): Promise<SyncResult> => {
 	// Create database index.
-	const index = new DatabaseIndex(databasePath);
+	const index = new DatabaseIndex(options.databasePath);
 
 	// Check metadata to see if a sync is actually needed.
 	const metadata: Metadata = {
@@ -30,7 +53,7 @@ export default async (databasePath: string, dumpPath: string): Promise<SyncResul
 			macros: await index.version('macros'),
 		},
 	};
-	const metafile = join(dumpPath, 'metadata.json');
+	const metafile = join(options.dumpPath, 'metadata.json');
 	try {
 		const oldMetadata = JSON.parse(await readFile(metafile, 'utf-8')) as Metadata;
 		if (isDeepStrictEqual(metadata, oldMetadata)) {
@@ -49,7 +72,7 @@ export default async (databasePath: string, dumpPath: string): Promise<SyncResul
 	// Ensure the folders exist.
 	await Promise.all(
 		folders.getFolderPaths().map(async (name) => {
-			const path = join(dumpPath, name);
+			const path = join(options.dumpPath, name);
 			await mkdir(path, { recursive: true });
 			updatedPaths.add(path);
 		}),
@@ -61,7 +84,7 @@ export default async (databasePath: string, dumpPath: string): Promise<SyncResul
 		filePromises.push((async () => {
 			const ext = macro.type === 'script' ? '.js' : '.macro';
 			const filename = `${macro.name} [${macro._id}]${ext}`;
-			const path = join(dumpPath, folders.getPath(macro.folder), filename);
+			const path = join(options.dumpPath, folders.getPath(macro.folder), filename);
 			await writeFile(path, macro.command);
 			updatedPaths.add(path);
 		})());
@@ -74,7 +97,7 @@ export default async (databasePath: string, dumpPath: string): Promise<SyncResul
 
 	// Remove any old items that are no longer needed.
 	const items = await glob('**/*', {
-		cwd: dumpPath,
+		cwd: options.dumpPath,
 		dot: true,
 		ignore: [
 			'./',

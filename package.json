@@ -41,7 +41,9 @@
     "typescript": "^5.4.3"
   },
   "dependencies": {
+    "@commander-js/extra-typings": "^12.0.1",
     "classic-level": "^1.4.1",
+    "commander": "^12.0.0",
     "glob": "^10.3.10",
     "typescript-memoize": "^1.1.1"
   },

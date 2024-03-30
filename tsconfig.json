@@ -1,5 +1,8 @@
 {
-	"include": ["src/**/*", "test/**/*"],
+	"include": [
+		"package.json",
+		"src/**/*",
+	],
 	"compilerOptions": {
 		"strict": true,
 		"baseUrl": "./",
@@ -7,6 +10,7 @@
 		"target": "esnext",
 		"module": "nodenext",
 		"moduleResolution": "nodenext",
+		"resolveJsonModule": true,
 		"sourceMap": true,
 		"experimentalDecorators": true,
 		"pretty": true,

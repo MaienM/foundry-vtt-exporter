@@ -1,29 +1,31 @@
 /* istanbul ignore file */
 /* eslint-disable no-console */
 
+import { Command } from '@commander-js/extra-typings';
+import packageInfo from '../package.json' with { type: 'json' };
 import sync, { SyncResult } from './sync.js';
 
-const main = async () => {
-	// Parse arguments.
-	const args = process.argv.slice(2);
-	const sourceDir = args[0];
-	const targetDir = args[1];
-	if (args.length !== 2 || targetDir === undefined) {
-		console.error(`Usage: ${process.argv.slice(0, 2).join(' ')} [source] [target]`);
-		process.exit(1);
-	}
-
-	// eslint-disable-next-line default-case
-	switch (await sync(sourceDir, targetDir)) {
-		case SyncResult.Updated:
-			console.log('Updated dump.');
-			break;
-		case SyncResult.NoChange:
-			console.log('Dump already up to date.');
-			break;
-	}
-};
-
-await main();
+new Command()
+	.name(packageInfo.name)
+	.description(packageInfo.description)
+	.version(packageInfo.version)
+	.argument('<databases>', 'path to the directory containing the Foundry VTT databases')
+	.argument('<dump>', 'path to the directory to store the dump in')
+	.action(async (databasePath: string, dumpPath: string) => {
+		const result = await sync({
+			databasePath,
+			dumpPath,
+		});
+		// eslint-disable-next-line default-case
+		switch (result) {
+			case SyncResult.Updated:
+				console.log('Updated dump.');
+				break;
+			case SyncResult.NoChange:
+				console.log('Dump already up to date.');
+				break;
+		}
+	})
+	.parse();
 
 /* eslint-enable */

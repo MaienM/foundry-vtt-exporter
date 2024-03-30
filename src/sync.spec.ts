@@ -6,28 +6,34 @@ import sync, { SyncResult } from './sync.js';
 describe('sync', () => {
 	it.each(Object.entries(DUMP_PATHS))(
 		'should dump %s correctly starting with an empty directory',
-		async (_dump, path) => {
-			const target = await createTempDir();
-			const result = await sync(path, target);
+		async (_dump, databasePath) => {
+			const dumpPath = await createTempDir();
+			const result = await sync({
+				databasePath,
+				dumpPath,
+			});
 
 			expect(result).toBe(SyncResult.Updated);
-			await expect(target).toMatchDirectory(join(path, 'result'));
+			await expect(dumpPath).toMatchDirectory(join(databasePath, 'result'));
 		},
 	);
 
 	it.each(Object.entries(DUMP_PATHS))(
 		'should report no change for %s when starting with an up-to-date dump',
-		async (_dump, path) => {
-			const existingDump = join(path, 'result');
-			const target = await createTempDir();
-			await rmdir(target);
-			await cp(existingDump, target, {
+		async (_dump, databasePath) => {
+			const existingDump = join(databasePath, 'result');
+			const dumpPath = await createTempDir();
+			await rmdir(dumpPath);
+			await cp(existingDump, dumpPath, {
 				recursive: true,
 			});
-			const result = await sync(path, target);
+			const result = await sync({
+				databasePath,
+				dumpPath,
+			});
 
 			expect(result).toBe(SyncResult.NoChange);
-			await expect(target).toMatchDirectory(existingDump);
+			await expect(dumpPath).toMatchDirectory(existingDump);
 		},
 	);
 
@@ -37,14 +43,17 @@ describe('sync', () => {
 		const toPath = DUMP_PATHS[to];
 
 		const existingDump = join(fromPath, 'result');
-		const target = await createTempDir();
-		await rmdir(target);
-		await cp(existingDump, target, {
+		const dumpPath = await createTempDir();
+		await rmdir(dumpPath);
+		await cp(existingDump, dumpPath, {
 			recursive: true,
 		});
-		const result = await sync(toPath, target);
+		const result = await sync({
+			databasePath: toPath,
+			dumpPath,
+		});
 
 		expect(result).toBe(SyncResult.Updated);
-		await expect(target).toMatchDirectory(join(toPath, 'result'));
+		await expect(dumpPath).toMatchDirectory(join(toPath, 'result'));
 	});
 });

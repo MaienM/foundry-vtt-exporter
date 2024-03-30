@@ -14,7 +14,9 @@ export default {
 		prefix: '<rootDir>',
 	}),
 
-	testMatch: ['**/*.spec.ts'],
+	testMatch: [
+		'**/*.spec.ts',
+	],
 	clearMocks: true,
 	restoreMocks: true,
 	setupFilesAfterEnv: [
@@ -27,6 +29,7 @@ export default {
 		'./src/**/*.ts',
 	],
 	coveragePathIgnorePatterns: [
+		'./src/main.ts',
 		'/__tests__/',
 	],
 };
