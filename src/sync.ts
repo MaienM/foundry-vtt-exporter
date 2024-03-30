@@ -80,12 +80,10 @@ export default async (options: SyncOptions): Promise<SyncResult> => {
 
 	// Update all files.
 	const filePromises = [];
-	for await (const macro of macros.values()) {
+	for await (const file of macros.getFiles()) {
 		filePromises.push((async () => {
-			const ext = macro.type === 'script' ? '.js' : '.macro';
-			const filename = `${macro.name} [${macro._id}]${ext}`;
-			const path = join(options.dumpPath, folders.getPath(macro.folder), filename);
-			await writeFile(path, macro.command);
+			const path = join(options.dumpPath, folders.getPath(file.folder), file.filename);
+			await writeFile(path, file.contents);
 			updatedPaths.add(path);
 		})());
 	}

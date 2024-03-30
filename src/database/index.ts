@@ -1,13 +1,13 @@
 import { join } from 'node:path';
 import { Memoize } from 'typescript-memoize';
 import { DatabaseClass } from './base.js';
-import FoldersDatabase from './folders.js';
-import MacroDatabase from './macro.js';
+import FolderDatabase from './folders.js';
+import MacrosDatabase from './macros.js';
 import DatabasePath from './path.js';
 
 const CLASSES = {
-	folders: FoldersDatabase,
-	macros: MacroDatabase,
+	folders: FolderDatabase,
+	macros: MacrosDatabase,
 };
 
 type InstanceTypeSpy<T> = InstanceType<{ new(): never } & T>;

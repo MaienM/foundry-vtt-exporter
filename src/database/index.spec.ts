@@ -1,7 +1,7 @@
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import FoldersDatabase from './folders.js';
-import MacroDatabase from './macro.js';
+import FolderDatabase from './folders.js';
+import MacrosDatabase from './macros.js';
 import DatabasePath from './path.js';
 import DatabaseIndex from './index.js';
 
@@ -62,7 +62,7 @@ describe('DatabaseIndex', () => {
 			jest.spyOn(index, 'path').mockReturnValue(path);
 
 			await index.open('folders');
-			expect(path.open).toHaveBeenCalledWith(FoldersDatabase);
+			expect(path.open).toHaveBeenCalledWith(FolderDatabase);
 		});
 
 		it('should use the correct type for macros', async () => {
@@ -73,7 +73,7 @@ describe('DatabaseIndex', () => {
 			jest.spyOn(index, 'path').mockReturnValue(path);
 
 			await index.open('macros');
-			expect(path.open).toHaveBeenCalledWith(MacroDatabase);
+			expect(path.open).toHaveBeenCalledWith(MacrosDatabase);
 		});
 	});
 });

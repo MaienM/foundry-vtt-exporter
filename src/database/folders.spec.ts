@@ -35,8 +35,7 @@ describe('FoldersDatabase', () => {
 				type: 'Compendium',
 			},
 		]);
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-		return FoldersDatabase.create(levelDB) as Promise<FoldersDatabase>;
+		return FoldersDatabase.create<FoldersDatabase>(levelDB);
 	};
 
 	describe('.getPath', () => {

@@ -27,7 +27,7 @@ class BaseDatabase<T> {
 	/**
 	 * Construct and {@see init}ialize an instance of this class.
 	 */
-	static async create<T, D extends BaseDatabase<T>>(db: ClassicLevel): Promise<D> {
+	static async create<D extends BaseDatabase<unknown>>(db: ClassicLevel): Promise<D> {
 		const inst = new this(db) as D;
 		await inst.init();
 		return inst;
