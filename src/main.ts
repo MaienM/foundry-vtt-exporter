@@ -16,7 +16,6 @@ new Command()
 			databasePath,
 			dumpPath,
 		});
-		// eslint-disable-next-line default-case
 		switch (result) {
 			case SyncResult.Updated:
 				console.log('Updated dump.');

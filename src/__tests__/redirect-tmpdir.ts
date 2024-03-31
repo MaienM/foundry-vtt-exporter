@@ -15,11 +15,6 @@ declare module 'expect' {
 		 * The value to use for os.tmpdir().
 		 */
 		tmptmpdir: string;
-
-		/**
-		 * Create a temporary directory that's outside of the altered os.tmpdir() that's been created for this test.
-		 */
-		createTempDir: () => Promise<string>;
 	}
 }
 
@@ -48,6 +43,9 @@ afterAll(async () => {
 });
 
 declare global {
+	/**
+	 * Create a temporary directory that's outside of the altered os.tmpdir() that's been created for this test.
+	 */
 	function createTempDir(): Promise<string>;
 }
 

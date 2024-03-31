@@ -1,1 +1,0 @@
-alert('Example script macro 2, version 1');

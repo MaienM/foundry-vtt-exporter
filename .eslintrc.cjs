@@ -8,6 +8,7 @@ module.exports = {
 		'no-continue': 'off',
 		'no-restricted-syntax': 'off',
 		'generator-star-spacing': 'off',
+		'default-case': 'off',
 		'jsdoc/require-yields': 'off',
 		'@typescript-eslint/indent': 'off',
 		'object-curly-newline': 'off',

@@ -9,7 +9,7 @@
   "exports": "./src/main.js",
   "scripts": {
     "test": "jest",
-    "test:watch": "jest --watchAll",
+    "test:watch": "jest --watch",
     "start": "node --import=./ts-loader.js ./src/main.ts",
     "build": "tsc"
   },
