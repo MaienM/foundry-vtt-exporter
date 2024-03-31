@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* eslint-disable no-console */
 
-import { Command } from '@commander-js/extra-typings';
+import { Command, Option } from '@commander-js/extra-typings';
 import packageInfo from '../package.json' with { type: 'json' };
 import sync, { SyncResult } from './sync.js';
 
@@ -11,10 +11,19 @@ new Command()
 	.version(packageInfo.version)
 	.argument('<databases>', 'path to the directory containing the Foundry VTT databases')
 	.argument('<dump>', 'path to the directory to store the dump in')
-	.action(async (databasePath: string, dumpPath: string) => {
+	.addOption(
+		new Option(
+			'--vcs <vcs>',
+			'the version control system that is used to manage the dump directory',
+		)
+			.choices(['none', 'auto', 'git'] as const)
+			.default('auto' as const),
+	)
+	.action(async (databasePath, dumpPath, options) => {
 		const result = await sync({
 			databasePath,
 			dumpPath,
+			...options,
 		});
 		switch (result) {
 			case SyncResult.Updated:
