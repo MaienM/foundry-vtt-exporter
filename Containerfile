@@ -27,5 +27,6 @@ COPY --from=builder /app/package.json /app/yarn.lock .
 RUN yarn --frozen-lockfile --production && yarn cache clean
 
 COPY --from=builder /app/dist ./dist
+COPY entrypoint.sh .
 
-ENTRYPOINT ["node", "/app/dist/main.js"]
+ENTRYPOINT ["sh", "entrypoint.sh"]
