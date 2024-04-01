@@ -95,6 +95,13 @@ jobs:
     permissions:
       contents: read
       packages: write
+    strategy:
+      matrix:
+        variant:
+          - target: variant-regular
+            suffix: ''
+          - target: variant-git
+            suffix: '-git'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -118,6 +125,8 @@ jobs:
         uses: docker/metadata-action@v5.5.1
         with:
           images: ghcr.io/${{ github.repository }}
+          flavor: |
+            suffix=${{ matrix.variant.suffix }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -134,6 +143,7 @@ jobs:
         with:
           context: .
           file: Containerfile
+          target: ${{ matrix.variant.target }}
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.metadata.outputs.tags }}

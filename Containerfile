@@ -16,10 +16,10 @@ COPY tsconfig.json .
 RUN yarn run build
 
 #
-# Runtime.
+# Base runtime.
 #
 
-FROM node:${NODE_VERSION}-alpine
+FROM node:${NODE_VERSION}-alpine as runtime
 
 WORKDIR /app
 
@@ -27,6 +27,24 @@ COPY --from=builder /app/package.json /app/yarn.lock .
 RUN yarn --frozen-lockfile --production && yarn cache clean
 
 COPY --from=builder /app/dist ./dist
-COPY entrypoint.sh .
+COPY container/entrypoint-base.sh /app
 
 ENTRYPOINT ["sh", "entrypoint.sh"]
+
+#
+# Regular variant.
+#
+
+FROM runtime as variant-regular
+
+COPY container/entrypoint-regular.sh /app/entrypoint.sh
+
+#
+# Git variant.
+#
+
+FROM runtime as variant-git
+
+RUN apk add --no-cache git
+
+COPY container/entrypoint-git.sh /app/entrypoint.sh
