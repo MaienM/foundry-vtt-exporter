@@ -16,6 +16,7 @@ new Command()
 			'--vcs <vcs>',
 			'the version control system that is used to manage the dump directory',
 		)
+			.env('FVE_VCS')
 			.choices(['none', 'auto', 'git'] as const)
 			.default('auto' as const),
 	)
