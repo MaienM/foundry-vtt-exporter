@@ -45,6 +45,6 @@ COPY container/entrypoint-regular.sh /app/entrypoint.sh
 
 FROM runtime as variant-git
 
-RUN apk add --no-cache git
+RUN apk add --no-cache git openssh
 
 COPY container/entrypoint-git.sh /app/entrypoint.sh
