@@ -17,7 +17,7 @@ if [ -n "$GIT_COMMIT" ]; then
 		(
 			cd /dump
 			git add --all
-			if [ "$(git diff | wc -l)" -eq 0 ]; then
+			if [ "$(git diff --staged | wc -l)" -eq 0 ]; then
 				return 0
 			fi
 			git commit --message "${GIT_COMMIT_MESSAGE:-Update}"
