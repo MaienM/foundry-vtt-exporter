@@ -24,6 +24,8 @@ When set to a non-empty value the container will watch the databases for changes
 
 When this is set the provided git repository will be cloned to `/dump`.
 
+Note that you'll need to ensure that the host key is either already known to the system or that validation is skipped (e.g. by setting `GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"`).
+
 Only available in the git variant of the image.
 
 #### `GIT_COMMIT`
