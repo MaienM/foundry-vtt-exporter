@@ -29,6 +29,9 @@ RUN yarn --frozen-lockfile --production && yarn cache clean
 COPY --from=builder /app/dist ./dist
 COPY container/entrypoint-base.sh /app
 
+RUN mkdir -p /dump
+RUN chown -R node:node /app /dump
+
 ENTRYPOINT ["sh", "entrypoint.sh"]
 
 #
