@@ -11,7 +11,7 @@ postrun() {
 }
 
 run() {
-	echo "[$(date +%F)] Running exporter"
+	echo "[$(date +'%F %T')] Running exporter"
 	prerun
 	node /app/dist/src/main.js /databases /dump
 	postrun
