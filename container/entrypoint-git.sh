@@ -6,17 +6,23 @@ set -e
 
 if [ -n "$GIT_COMMIT" ]; then
 	prerun() {
-		git reset --hard origin
-		git clean -dxf .
+		(
+			cd /dump
+			git reset --hard origin
+			git clean -dxf .
+		)
 	}
 
 	postrun() {
-		git add --all
-		if [ "$(git diff | wc -l)" -eq 0 ]; then
-			return 0
-		fi
-		git commit --message "${GIT_COMMIT_MESSAGE:-Update}"
-		git push
+		(
+			cd /dump
+			git add --all
+			if [ "$(git diff | wc -l)" -eq 0 ]; then
+				return 0
+			fi
+			git commit --message "${GIT_COMMIT_MESSAGE:-Update}"
+			git push
+		)
 	}
 fi
 
