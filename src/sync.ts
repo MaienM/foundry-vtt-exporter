@@ -139,7 +139,7 @@ export default async (options: SyncOptions): Promise<SyncResult> => {
 		dot: true,
 		ignore: [
 			'./',
-			...(vcs === 'git' ? ['.git/'] : []),
+			...(vcs === 'git' ? ['.git/**'] : []),
 		],
 		absolute: true,
 	});

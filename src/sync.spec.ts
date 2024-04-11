@@ -332,13 +332,14 @@ describe('sync', () => {
 	});
 
 	describe('with vcs = git', () => {
-		it('should keep .git folder', async () => {
+		it('should keep .git folder and contents', async () => {
 			setupDatabases({
 				folders: {},
 				macros: [],
 			});
 			const dumpPath = await createTempDir();
 			await mkdir(join(dumpPath, '.git'));
+			await writeFile(join(dumpPath, '.git', 'index'), 'INDEX');
 			await mkdir(join(dumpPath, 'Foo'));
 			await mkdir(join(dumpPath, 'Foo', '.git'));
 
@@ -352,6 +353,7 @@ describe('sync', () => {
 			const contents = new DirectoryContents();
 			contents.expectFile('metadata.json');
 			contents.expectDirectory('.git');
+			contents.expectFileWithContents(join('.git', 'index'), 'INDEX');
 			await expect(dumpPath).toMatchDirectory(contents);
 		});
 
