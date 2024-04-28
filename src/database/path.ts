@@ -1,8 +1,10 @@
+import assert from 'node:assert';
 import { existsSync } from 'node:fs';
 import { cp, readFile, rm, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { basename, join } from 'node:path';
 import { ClassicLevel } from 'classic-level';
+import { glob } from 'glob';
 import { Memoize } from 'typescript-memoize';
 import BaseDatabase, { DatabaseClass } from './base.js';
 
@@ -28,12 +30,16 @@ class DatabasePath {
 		const manifestName = await readFile(join(this.#sourceDir, 'CURRENT'), 'utf-8');
 		const manifestVersion = manifestName.replace('MANIFEST-', '').trim();
 
-		const logVersion = parseInt(manifestVersion, 10) + 1;
-		const logName = `${logVersion.toString(10).padStart(6, '0')}.log`;
-		const logStat = await stat(join(this.#sourceDir, logName));
+		const logFiles = await glob('*.log', {
+			cwd: this.#sourceDir,
+		});
+		assert(logFiles.length === 1, `Should have exactly one log file, got ${JSON.stringify(logFiles)}.`);
+		const [logFile] = logFiles;
+		const logVersion = logFile.replace('.log', '');
+		const logStat = await stat(join(this.#sourceDir, logFile));
 		const logSize = logStat.size;
 
-		return `${manifestVersion}+${logSize}`;
+		return `${manifestVersion}+${logVersion}+${logSize}`;
 	}
 
 	/**
